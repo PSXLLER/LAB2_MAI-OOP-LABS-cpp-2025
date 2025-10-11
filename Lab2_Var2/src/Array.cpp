@@ -1,117 +1,259 @@
 #include "Array.h"
 #include <algorithm>
-#include <utility>
-using namespace std;
 
-Array::Array(): data(nullptr), len(0) {}
+using std::max;
 
-Array::Array(size_t n, unsigned char v) {
-    len = n;
-    if (!n) { data = nullptr; return; }
-    data = new unsigned char[n];
-    for (size_t i = 0; i < n; ++i) data[i] = v;
-}
+Array::Array()
+    {
+        data = nullptr;
+        length = 0;
+    }
 
-Array::Array(initializer_list<unsigned char> t) {
-    len = t.size();
-    data = len ? new unsigned char[len] : nullptr;
-    size_t i = 0;
-    for (auto x : t) data[i++] = x;
-}
+Array::Array(const size_t& n, unsigned char t)
+    {
+        length = n;
+        
+        if(n == 0)
+        {
+            data = nullptr;
+        }
+        else
+        {
+            data = new unsigned char[n];
+            
+            for(size_t i = 0; i < n; i++)
+            {
+                data[i] = t;
+            }
 
-Array::Array(const string& s) {
-    len = s.size();
-    data = len ? new unsigned char[len] : nullptr;
-    for (size_t i = 0; i < len; ++i)
-        data[i] = static_cast<unsigned char>(s[i]);
-}
+        }
+    }
 
-Array::Array(const Array& a) {
-    len = a.len;
-    data = len ? new unsigned char[len] : nullptr;
-    if (data) std::copy(a.data, a.data + len, data);
-}
+Array::Array(const initializer_list<unsigned char> &t)
+    {
+        length = t.size();
 
-Array::Array(Array&& a) noexcept {
-    data = a.data;
-    len = a.len;
-    a.data = nullptr;
-    a.len = 0;
-}
+        if(length == 0)
+        {
+            data = nullptr;
+        }
+        else
+        {
+            data = new unsigned char[length];
+            size_t i = 0;
+            for (unsigned char value: t)
+            {
+                data[i++] = value;
+            }
+        }
+    }
 
-Array::~Array() noexcept { delete[] data; }
+Array::Array(const string& t)
+    {
+        length = t.size();
 
-Array& Array::operator=(const Array& a) {
-    if (this == &a) return *this;
-    delete[] data;
-    len = a.len;
-    data = len ? new unsigned char[len] : nullptr;
-    if (data) copy(a.data, a.data + len, data);
+        if(length == 0)
+        {
+            data = nullptr;
+        }
+        else
+        {
+            data = new unsigned char[length];
+            for(size_t i = 0; i < length; i++)
+            {
+                data[i] = static_cast<unsigned char>(t[i]);
+            }
+        }
+    }
+
+Array::Array(const Array& other)
+    {
+        length = other.length;
+
+        if(length == 0)
+        {
+            data = nullptr;
+        }
+        else
+        {
+            data = new unsigned char[length];
+            for(size_t i = 0; i < length; i++)
+            {
+                data[i] = other.data[i];
+            } 
+        }
+    }
+
+Array::Array(Array&& other) noexcept
+    {
+        length = other.length;
+        data = other.data;
+
+        other.length = 0;
+        other.data = nullptr; 
+    }
+
+Array::~Array() noexcept
+    {
+        delete[] data;
+    }
+
+Array& Array::operator=(const Array& other)
+{
+    if (this != &other)
+    {
+        delete[] data; // очищаем старые данные
+
+        length = other.length;
+        if (length == 0)
+        {
+            data = nullptr;
+        }
+        else
+        {
+            data = new unsigned char[length];
+            for (size_t i = 0; i < length; ++i)
+            {
+                data[i] = other.data[i];
+            }
+        }
+    }
     return *this;
 }
 
-Array& Array::operator=(Array&& a) noexcept {
-    if (this == &a) return *this;
-    delete[] data;
-    data = a.data;
-    len = a.len;
-    a.data = nullptr;
-    a.len = 0;
+Array& Array::operator=(Array&& other) noexcept
+{
+    if (this != &other)
+    {
+        delete[] data;
+
+        data = other.data;
+        length = other.length;
+
+        other.data = nullptr;
+        other.length = 0;
+    }
     return *this;
 }
 
-size_t Array::size() const { return len; }
 
-unsigned char Array::at(size_t i) const {
-    if (i >= len) throw out_of_range("bad index");
-    return data[i];
-}
-
-Array Array::add(const Array& other) const {
-    if (len != other.len) throw invalid_argument("len mismatch");
-    Array r(len);
-    for (size_t i = 0; i < len; ++i) r.data[i] = data[i] + other.data[i];
-    return r;
-}
-
-Array Array::sub(const Array& other) const {
-    if (len != other.len) throw invalid_argument("len mismatch");
-    Array r(len);
-    for (size_t i = 0; i < len; ++i) r.data[i] = data[i] - other.data[i];
-    return r;
-}
-
-bool Array::eq(const Array& other) const {
-    if (len != other.len) return false;
-    for (size_t i = 0; i < len; ++i)
-        if (data[i] != other.data[i]) return false;
-    return true;
-}
-
-bool Array::less(const Array& other) const {
-    size_t m = std::min(len, other.len);
-    for (size_t i = 0; i < m; ++i) {
-        size_t k = m - 1 - i;
-        if (data[k] < other.data[k]) return true;
-        if (data[k] > other.data[k]) return false;
+size_t Array::size() const
+    {
+        return length;
     }
-    return len < other.len;
-}
 
-bool Array::greater(const Array& other) const {
-    return !eq(other) && !less(other);
-}
-
-void Array::set(size_t i, unsigned char v) {
-    if (i >= len) throw out_of_range("bad index");
-    data[i] = v;
-}
-
-void Array::show(ostream& os) const {
-    os << "[";
-    for (size_t i = 0; i < len; ++i) {
-        os << int(data[i]);
-        if (i + 1 < len) os << ",";
+unsigned char Array::ar(size_t i) const
+    {
+        if(i >= length)
+        {
+            throw out_of_range("Index out of range!!! Please enter another one.");
+        }
+        return data[i];
     }
-    os << "]";
-}
+
+Array Array::add(const Array& other) const
+    {
+        if(length != other.length)
+        {
+            throw invalid_argument("Arrays cannot be added together!!! Their lengths are different. Please try other arrays.");
+        }
+        Array result(length);
+
+        for(size_t i = 0; i < length; i++)
+        {
+            result.data[i] = data[i] + other.data[i];
+        }
+        return result;
+    }
+
+Array Array::sub(const Array& other) const
+    {
+        if(length != other.length)
+        {
+            throw invalid_argument("Arrays cannot be subtracted!!! Their lengths are different. Please try other arrays.");
+        }
+        Array result(length);
+
+        for(size_t i = 0; i < length; i++)
+        {
+            result.data[i] = data[i] - other.data[i];
+        }
+        return result;
+    }
+
+bool Array::equal(const Array& other) const
+    {
+        if(length != other.length)
+        {
+            return false;
+        }
+        else
+        {
+            for(size_t i = 0; i < length; i++)
+            {
+                if(data[i] != other.data[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+bool Array::less(const Array& other) const
+    {
+        
+        size_t min_length {0};
+        
+        if(length < other.length)
+        {
+            min_length = length;
+        }
+        else
+        {
+            min_length = other.length;
+        }
+        for (size_t i = 0; i < min_length; i++)
+        {
+            size_t idx = min_length - 1 - i;
+            if(data[idx] < other.data[idx])
+            {
+                return true;
+            }
+            if(data[idx] > other.data[idx])
+            {
+                return false;
+            }
+        
+        }
+        return length < other.length;
+    }
+
+bool Array::greater(const Array& other) const
+    {
+        return !less(other) && !equal(other);
+    }
+
+void Array::print(ostream& os) const
+    {
+        os << "[";
+
+        for(size_t i = 0; i < length; i++)
+        {
+            os << (int)data[i];
+            if((i + 1) < length)
+            {
+                os << ", ";
+            }
+        }
+        os << "]";
+    }
+
+void Array::set(size_t i, unsigned char v)
+    {
+        if(i >= length)
+        {
+            throw out_of_range("Index out of range!!! Please enter another one.");
+        }
+        data[i] = v;
+    }

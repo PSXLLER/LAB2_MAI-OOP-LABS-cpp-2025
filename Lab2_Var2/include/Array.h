@@ -1,38 +1,43 @@
 #pragma once
+
 #include <iostream>
 #include <initializer_list>
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 
-using std::string;
 using std::initializer_list;
+using std::string;
 using std::out_of_range;
 using std::invalid_argument;
 using std::ostream;
+using std::cout;
 
-class Array {
+class Array
+{
+    private:
     unsigned char* data;
-    size_t len;
-public:
+    size_t length;
+
+    public:
     Array();
-    Array(size_t n, unsigned char v = 0);
-    Array(initializer_list<unsigned char> t);
-    Array(const string& s);
-    Array(const Array& a);
-    Array(Array&& a) noexcept;
+    Array(const size_t& n, unsigned char t = 0);
+    Array(const initializer_list<unsigned char> &t);
+    Array(const string& t);
+    Array(const Array& other);
+    Array(Array&& other) noexcept;
     virtual ~Array() noexcept;
 
-    Array& operator=(const Array& a);
-    Array& operator=(Array&& a) noexcept;
+    Array& operator=(const Array& other);
+    Array& operator=(Array&& other) noexcept;
 
     size_t size() const;
-    unsigned char at(size_t i) const;
+    unsigned char ar(size_t i) const;
     Array add(const Array& other) const;
     Array sub(const Array& other) const;
-    bool eq(const Array& other) const;
+    bool equal(const Array& other) const;
     bool less(const Array& other) const;
     bool greater(const Array& other) const;
+    void print(ostream& os = cout) const;
     void set(size_t i, unsigned char v);
-    void show(ostream& os = std::cout) const;
 };
-

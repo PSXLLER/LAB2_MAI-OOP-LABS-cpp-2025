@@ -1,35 +1,41 @@
 #pragma once
-#include "Array.h"
-#include <string>
-#include <iostream>
-using std::string;
-using std::ostream;
 
-class Hex {
+#include "Array.h"
+#include <iostream>
+#include <string>
+
+using std::invalid_argument;
+using std::ostream;
+using std::cout;
+using std::string;
+
+class Hex
+{
+    private:
     Array digits;
-    static unsigned char toVal(char c);
-    static char toChr(unsigned char v);
-public:
+
+    static unsigned char CharToHex(char c);
+    static char HexToChar(unsigned char v);
+
+    public:
     Hex();
-    Hex(const Hex& h);
-    Hex(Hex&& h) noexcept;
-    explicit Hex(const string& s);
-    Hex(std::initializer_list<unsigned char> t);
-    explicit Hex(const Array& a);
+    Hex(const Hex& other);
+    Hex(Hex&& other) noexcept;
+    explicit Hex(const string& str);
+    Hex(const initializer_list<unsigned char>& t);
+    explicit Hex(const Array& arr);
     ~Hex() noexcept;
 
-    Hex& operator=(const Hex& other);
-    Hex& operator=(Hex&& other) noexcept;
     size_t size() const;
     string toString() const;
-    Hex add(const Hex& h) const;
-    Hex sub(const Hex& h) const;
+    Hex add(const Hex& other) const;
+    Hex sub(const Hex& other) const;
     Hex copy() const;
-    bool eq(const Hex& h) const;
-    bool less(const Hex& h) const;
-    bool greater(const Hex& h) const;
-    void print(ostream& os = std::cout) const;
-    void add_a(const Hex& h);
-    void sub_a(const Hex& h);
-    void copy_a(const Hex& h);
+    bool equal(const Hex& other) const;
+    bool less(const Hex& other) const;
+    bool greater(const Hex& other) const;
+    void print(ostream& os = cout) const;
+    void add_a(const Hex& other);
+    void sub_a(const Hex& other);
+    void copy_a(const Hex& other);
 };
