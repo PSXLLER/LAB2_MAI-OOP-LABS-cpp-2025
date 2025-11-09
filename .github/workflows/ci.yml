@@ -34,13 +34,21 @@ jobs:
     - name: Run tests and export JUnit report (via GTest)
       run: |
         cd Lab2_Var2/build
-        # ищем бинарник с тестами (например HexArrayTests)
-        TEST_BIN=$(find . -type f -executable -name "*Tests" | head -n 1)
-        echo "Found test binary: $TEST_BIN"
-        chmod +x "$TEST_BIN"
-        # запускаем его напрямую, чтобы GTest сам создал junit xml
-        "$TEST_BIN" --gtest_output=xml:test-results.xml || true
-        ls -l test-results.xml || true
+        if [ ! -f HexArrayTests ]; then
+          echo "❌ Test binary HexArrayTests not found"
+          echo "Contents of build directory:"
+          ls -la
+          exit 1
+        fi
+
+        echo "✅ Found test binary HexArrayTests"
+        chmod +x HexArrayTests
+
+        # Запуск тестов с экспортом отчёта
+        ./HexArrayTests --gtest_output=xml:test-results.xml || true
+
+        echo "📄 Generated test-results.xml:"
+        ls -l test-results.xml || echo "⚠️ No XML generated!"
 
     - name: Upload raw test results
       if: always()
