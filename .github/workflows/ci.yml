@@ -31,14 +31,16 @@ jobs:
     - name: Build all targets
       run: cmake --build Lab2_Var2/build
 
-    - name: Run tests and generate JUnit report (CMake < 3.30)
+    - name: Run tests and export JUnit report (via GTest)
       run: |
         cd Lab2_Var2/build
-        ctest --output-on-failure || true
-        # Генерация JUnit отчёта (через CTest dashboard)
-        ctest -T Test || true
-        # JUnit файл создаётся здесь:
-        cp Testing/*/Test.xml test-results.xml || true
+        # ищем бинарник с тестами (например HexArrayTests)
+        TEST_BIN=$(find . -type f -executable -name "*Tests" | head -n 1)
+        echo "Found test binary: $TEST_BIN"
+        chmod +x "$TEST_BIN"
+        # запускаем его напрямую, чтобы GTest сам создал junit xml
+        "$TEST_BIN" --gtest_output=xml:test-results.xml || true
+        ls -l test-results.xml || true
 
     - name: Upload raw test results
       if: always()
