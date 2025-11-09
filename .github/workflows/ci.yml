@@ -21,23 +21,23 @@ jobs:
         sudo ln -sf /usr/bin/gcc-14 /usr/bin/cc
         sudo ln -sf /usr/bin/g++-14 /usr/bin/c++
 
-    - name: Configure project
+    - name: Configure project with CMake
       run: |
         cmake -G Ninja -S Lab2_Var2 -B Lab2_Var2/build \
           -DCMAKE_C_COMPILER=/usr/bin/gcc-14 \
           -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 \
           -DCMAKE_BUILD_TYPE=Release
 
-    - name: Build project
-      run: cmake --build Lab2_Var2/build --target HexArrayTests
+    - name: Build all targets
+      run: cmake --build Lab2_Var2/build
 
-    - name: Run tests with JUnit report
+    - name: Run tests and generate JUnit report
       run: |
         cd Lab2_Var2/build
         ctest --output-on-failure --no-tests=error \
               -T test --test-output-junit test-results.xml
 
-    - name: Upload test results
+    - name: Upload raw test results
       if: always()
       uses: actions/upload-artifact@v4
       with:
