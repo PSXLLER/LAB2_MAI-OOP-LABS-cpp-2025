@@ -18,8 +18,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake ninja-build gcc-14 g++-14
-        sudo ln -s /usr/bin/gcc-14 /usr/bin/cc
-        sudo ln -s /usr/bin/g++-14 /usr/bin/c++
+        sudo ln -sf /usr/bin/gcc-14 /usr/bin/cc
+        sudo ln -sf /usr/bin/g++-14 /usr/bin/c++
 
     - name: Configure project
       run: |
@@ -31,13 +31,14 @@ jobs:
     - name: Build project
       run: cmake --build Lab2_Var2/build --target HexArrayTests
 
-    - name: Run tests with report
+    - name: Run tests with JUnit report
       run: |
-        ctest --test-dir Lab2_Var2/build --output-on-failure --no-tests=error \
-              --output-junit Lab2_Var2/build/test-results.xml
+        cd Lab2_Var2/build
+        ctest --output-on-failure --no-tests=error \
+              -T test --test-output-junit test-results.xml
 
     - name: Upload test results
-      if: always() # даже если тесты упали
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: gtest-results
